@@ -3,9 +3,10 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const isDev = !app.isPackaged;
 
-// dist-electron/main.js  ->  ..  ->  racine du projet
-process.env.APP_ROOT = path.join(__dirname, '..');
+// En dev : racine du projet. En prod packagée : dossier app (asar).
+process.env.APP_ROOT = isDev ? path.join(__dirname, '..') : app.getAppPath();
 
 export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
 export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron');
@@ -18,7 +19,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
 let win: BrowserWindow | null = null;
 
 const APP_ICON = VITE_DEV_SERVER_URL
-  ? path.join(process.env.APP_ROOT!, 'public', 'logo-white.png')
+  ? path.join(process.env.APP_ROOT, 'public', 'logo-white.png')
   : path.join(RENDERER_DIST, 'logo-white.png');
 
 function createWindow() {
@@ -30,25 +31,36 @@ function createWindow() {
     title: 'FCA Fiche Joueur',
     icon: APP_ICON,
     backgroundColor: '#08080a',
+    show: false,
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
+      sandbox: false,
     },
   });
 
-  // Ouvre les liens externes dans le navigateur par défaut
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('http')) shell.openExternal(url);
     return { action: 'deny' };
   });
 
+  win.webContents.on('did-fail-load', (_event, code, description, url) => {
+    console.error('Échec chargement:', code, description, url);
+  });
+
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);
   } else {
-    win.loadFile(path.join(RENDERER_DIST, 'index.html'));
+    // Hash obligatoire pour React Router (HashRouter) en file://
+    win.loadFile(path.join(RENDERER_DIST, 'index.html'), { hash: '/' });
   }
+
+  win.once('ready-to-show', () => {
+    win?.show();
+    win?.focus();
+  });
 
   win.on('focus', () => {
     win?.webContents.focus();

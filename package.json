@@ -54,7 +54,8 @@
     "icon": "build/logoFCA.png",
     "win": {
       "target": "nsis",
-      "icon": "build/logoFCA.png"
+      "icon": "build/logoFCA.png",
+      "signAndEditExecutable": false
     },
     "mac": {
       "target": "dmg",

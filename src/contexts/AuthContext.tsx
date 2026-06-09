@@ -58,12 +58,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let active = true;
 
-    getSession().then(async (s) => {
-      if (!active) return;
-      setSession(s);
-      if (s?.user) await loadProfile();
-      setLoading(false);
-    });
+    getSession()
+      .then(async (s) => {
+        if (!active) return;
+        setSession(s);
+        if (s?.user) await loadProfile();
+      })
+      .catch((err) => {
+        console.error('Erreur de session:', err);
+        setSession(null);
+        setProfile(null);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
 
     const { data: sub } = supabase.auth.onAuthStateChange(
       async (_event, newSession) => {

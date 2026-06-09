@@ -1,6 +1,7 @@
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ConfirmProvider } from '@/contexts/ConfirmContext';
+import { isSupabaseConfigured } from '@/lib/supabase';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 import { Layout } from '@/components/Layout';
 import { Login } from '@/pages/Login';
@@ -27,7 +28,26 @@ function RootRedirect() {
   return <Navigate to={profile.role === 'coach' ? '/coach' : '/joueur'} replace />;
 }
 
+function ConfigError() {
+  return (
+    <div className="app-bg flex min-h-dvh items-center justify-center p-6">
+      <div className="card card-top-accent max-w-md p-8 text-center">
+        <h1 className="text-lg font-bold text-white">Configuration manquante</h1>
+        <p className="mt-3 text-sm text-zinc-400">
+          L&apos;application n&apos;a pas été compilée avec les identifiants Supabase.
+          Recompilez avec <code className="text-brand-300">VITE_SUPABASE_URL</code> et{' '}
+          <code className="text-brand-300">VITE_SUPABASE_ANON_KEY</code>.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
+  if (!isSupabaseConfigured) {
+    return <ConfigError />;
+  }
+
   return (
     <AuthProvider>
       <ConfirmProvider>
