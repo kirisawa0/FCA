@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-fca-black text-zinc-200 antialiased;
+    margin: 0;
+  }
+
+  /* Barre de défilement stylée */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a2a32;
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3a3a44;
+    background-clip: content-box;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-fca-black disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .btn-primary {
+    @apply btn bg-gold-gradient text-black shadow-gold-sm hover:shadow-gold hover:brightness-105 focus:ring-brand-500;
+  }
+  .btn-secondary {
+    @apply btn border border-fca-border bg-fca-gray text-zinc-200 hover:border-brand-400/40 hover:text-brand-300 focus:ring-fca-muted;
+  }
+  .btn-danger {
+    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  }
+  .btn-ghost {
+    @apply btn text-zinc-400 hover:bg-fca-gray hover:text-brand-300;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-fca-border bg-fca-surface px-3 py-2 text-sm text-zinc-100 shadow-inner transition placeholder:text-zinc-500 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-400/25;
+  }
+  .label {
+    @apply mb-1 block text-sm font-medium text-zinc-400;
+  }
+
+  /* Carte avec dégradé sombre et liseré subtil */
+  .card {
+    @apply relative rounded-2xl border border-fca-border bg-surface-gradient shadow-card;
+  }
+  /* Liseré doré en haut de carte */
+  .card-top-accent::before {
+    content: '';
+    @apply pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand-400/60 to-transparent;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold text-white;
+  }
+  .page-subtitle {
+    @apply text-zinc-500;
+  }
+
+  /* Texte en dégradé doré */
+  .text-gold {
+    @apply bg-gold-text bg-clip-text text-transparent;
+  }
+
+  .link-accent {
+    @apply font-medium text-brand-400 transition hover:text-brand-300 hover:underline;
+  }
+
+  .section-title {
+    @apply font-semibold text-white;
+  }
+
+  .table-head {
+    @apply border-b border-fca-border text-left text-xs uppercase tracking-wide text-zinc-500;
+  }
+  .table-row {
+    @apply border-b border-fca-border/60 transition last:border-0 hover:bg-brand-400/[0.04];
+  }
+}
+
+@layer utilities {
+  /* Fond global de l'app : noir + lueur dorée + grille */
+  .app-bg {
+    background-color: #08080a;
+    background-image:
+      radial-gradient(ellipse 70% 50% at 50% -10%, rgba(250, 204, 21, 0.12), transparent 70%),
+      linear-gradient(rgba(250, 204, 21, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(250, 204, 21, 0.04) 1px, transparent 1px);
+    background-size: 100% 100%, 46px 46px, 46px 46px;
+  }
+}
