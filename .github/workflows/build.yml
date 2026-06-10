@@ -58,8 +58,9 @@ jobs:
           if-no-files-found: error
 
   build-mac:
-    # macos-13 est un runner Intel : il garantit la génération compatible MacBook Pro 2019.
-    runs-on: macos-13
+    # macos-latest démarre beaucoup plus vite (macos-13 reste souvent en file d'attente 15+ min).
+    # electron-builder génère quand même les builds x64 compatibles Mac Intel 2019.
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -80,7 +81,7 @@ jobs:
           fi
           echo "Secrets Supabase OK."
 
-      - name: Build Mac DMG
+      - name: Build Mac (zip x64 + arm64)
         run: npm run dist:mac
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -91,9 +92,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: FCA-Fiche-Joueur-Mac-1.0.1
-          path: |
-            release/*.dmg
-            release/*.zip
+          path: release/*.zip
           retention-days: 90
           if-no-files-found: error
 
@@ -121,6 +120,5 @@ jobs:
         with:
           files: |
             release-win/*.exe
-            release-mac/*.dmg
             release-mac/*.zip
           generate_release_notes: true
