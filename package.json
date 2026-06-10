@@ -12,8 +12,8 @@
     "preview": "vite preview",
     "lint": "eslint . --ext .ts,.tsx",
     "dist": "npm run build && electron-builder",
-    "dist:win": "npm run build && electron-builder --win",
-    "dist:mac": "npm run build && electron-builder --mac"
+    "dist:win": "npm run build && electron-builder --win --publish never",
+    "dist:mac": "npm run build && electron-builder --mac --x64 --arm64 --publish never"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
@@ -54,14 +54,47 @@
     ],
     "icon": "build/logoFCA.png",
     "win": {
-      "target": "nsis",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "icon": "build/logoFCA.png",
+      "artifactName": "FCA-Fiche-Joueur-Setup-${version}-Windows.${ext}",
       "signAndEditExecutable": false
     },
     "mac": {
-      "target": "dmg",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
       "category": "public.app-category.sports",
-      "icon": "build/logoFCA.png"
+      "icon": "build/logoFCA.png",
+      "artifactName": "FCA-Fiche-Joueur-${version}-Mac-${arch}.${ext}",
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "identity": null,
+      "extendInfo": {
+        "LSMinimumSystemVersion": "10.13.0"
+      }
+    },
+    "dmg": {
+      "title": "FCA-Fiche-Joueur-${version}"
     }
   }
 }

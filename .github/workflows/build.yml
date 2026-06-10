@@ -37,7 +37,8 @@ jobs:
           retention-days: 30
 
   build-mac:
-    runs-on: macos-latest
+    # macos-13 est un runner Intel : il garantit la génération compatible MacBook Pro 2019.
+    runs-on: macos-13
     steps:
       - uses: actions/checkout@v4
 
@@ -61,7 +62,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: FCA-Fiche-Joueur-Mac
-          path: release/*.dmg
+          path: |
+            release/*.dmg
+            release/*.zip
           retention-days: 30
 
   release:
@@ -89,4 +92,5 @@ jobs:
           files: |
             release-win/*.exe
             release-mac/*.dmg
+            release-mac/*.zip
           generate_release_notes: true
