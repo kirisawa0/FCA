@@ -22,6 +22,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Vérifier les secrets Supabase
+        shell: pwsh
+        run: |
+          if (-not "${{ secrets.VITE_SUPABASE_URL }}" -or -not "${{ secrets.VITE_SUPABASE_ANON_KEY }}") {
+            Write-Error "Secrets manquants. Ajoutez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY dans Settings > Secrets > Actions."
+            exit 1
+          }
+          Write-Host "Secrets Supabase OK."
+
       - name: Build Windows installer
         run: npm run dist:win
         env:
@@ -29,12 +38,24 @@ jobs:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
+      - name: Vérifier que Supabase est compilé dans l'app
+        shell: pwsh
+        run: |
+          $js = Get-ChildItem dist/assets/*.js | Select-Object -First 1
+          $content = Get-Content $js.FullName -Raw
+          if ($content -notmatch 'supabase\.co') {
+            Write-Error "Supabase absent du build — l'exe serait cassé."
+            exit 1
+          }
+          Write-Host "Supabase détecté dans $($js.Name)."
+
       - name: Upload Windows artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FCA-Fiche-Joueur-Windows
-          path: release/*.exe
-          retention-days: 30
+          name: FCA-Fiche-Joueur-Windows-1.0.1
+          path: release/FCA-Fiche-Joueur-Setup-*.exe
+          retention-days: 90
+          if-no-files-found: error
 
   build-mac:
     # macos-13 est un runner Intel : il garantit la génération compatible MacBook Pro 2019.
@@ -51,6 +72,14 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Vérifier les secrets Supabase
+        run: |
+          if [ -z "${{ secrets.VITE_SUPABASE_URL }}" ] || [ -z "${{ secrets.VITE_SUPABASE_ANON_KEY }}" ]; then
+            echo "Secrets manquants. Ajoutez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY dans Settings > Secrets > Actions."
+            exit 1
+          fi
+          echo "Secrets Supabase OK."
+
       - name: Build Mac DMG
         run: npm run dist:mac
         env:
@@ -61,11 +90,12 @@ jobs:
       - name: Upload Mac artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FCA-Fiche-Joueur-Mac
+          name: FCA-Fiche-Joueur-Mac-1.0.1
           path: |
             release/*.dmg
             release/*.zip
-          retention-days: 30
+          retention-days: 90
+          if-no-files-found: error
 
   release:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -77,13 +107,13 @@ jobs:
       - name: Download Windows artifact
         uses: actions/download-artifact@v4
         with:
-          name: FCA-Fiche-Joueur-Windows
+          name: FCA-Fiche-Joueur-Windows-1.0.1
           path: ./release-win
 
       - name: Download Mac artifact
         uses: actions/download-artifact@v4
         with:
-          name: FCA-Fiche-Joueur-Mac
+          name: FCA-Fiche-Joueur-Mac-1.0.1
           path: ./release-mac
 
       - name: Create GitHub Release

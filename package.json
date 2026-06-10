@@ -1,6 +1,6 @@
 {
   "name": "fca-fiche-joueur",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Application desktop de gestion des fiches joueurs pour un club sportif (Coach / Joueur)",
   "author": "FCA",
   "private": true,
