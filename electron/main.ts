@@ -31,7 +31,7 @@ function createWindow() {
     title: 'FCA Fiche Joueur',
     icon: APP_ICON,
     backgroundColor: '#08080a',
-    show: false,
+    show: true,
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -50,17 +50,15 @@ function createWindow() {
     console.error('Échec chargement:', code, description, url);
   });
 
+  win.webContents.on('console-message', (_event, _level, message) => {
+    console.log('[renderer]', message);
+  });
+
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);
   } else {
-    // Hash obligatoire pour React Router (HashRouter) en file://
-    win.loadFile(path.join(RENDERER_DIST, 'index.html'), { hash: '/' });
+    win.loadFile(path.join(RENDERER_DIST, 'index.html'));
   }
-
-  win.once('ready-to-show', () => {
-    win?.show();
-    win?.focus();
-  });
 
   win.on('focus', () => {
     win?.webContents.focus();

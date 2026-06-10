@@ -48,8 +48,9 @@
       "buildResources": "build"
     },
     "files": [
-      "dist",
-      "dist-electron"
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
     ],
     "icon": "build/logoFCA.png",
     "win": {

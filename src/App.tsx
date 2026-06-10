@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, MemoryRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { ConfirmProvider } from '@/contexts/ConfirmContext';
 import { isSupabaseConfigured } from '@/lib/supabase';
@@ -43,16 +43,11 @@ function ConfigError() {
   );
 }
 
-export default function App() {
-  if (!isSupabaseConfigured) {
-    return <ConfigError />;
-  }
+const isDesktopFile = typeof window !== 'undefined' && window.location.protocol === 'file:';
 
+function AppRoutes() {
   return (
-    <AuthProvider>
-      <ConfirmProvider>
-        <HashRouter>
-        <Routes>
+    <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
@@ -140,10 +135,25 @@ export default function App() {
             }
           />
 
-          <Route path="/" element={<RootRedirect />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-        </HashRouter>
+      <Route path="/" element={<RootRedirect />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  );
+}
+
+export default function App() {
+  if (!isSupabaseConfigured) {
+    return <ConfigError />;
+  }
+
+  const Router = isDesktopFile ? MemoryRouter : HashRouter;
+
+  return (
+    <AuthProvider>
+      <ConfirmProvider>
+        <Router>
+          <AppRoutes />
+        </Router>
       </ConfirmProvider>
     </AuthProvider>
   );

@@ -1,8 +1,18 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 import react from '@vitejs/plugin-react';
 import electron from 'vite-plugin-electron';
 import renderer from 'vite-plugin-electron-renderer';
 import { resolve } from 'node:path';
+
+/** Electron charge les fichiers en file:// — l'attribut crossorigin bloque les scripts. */
+function electronHtmlFix(): Plugin {
+  return {
+    name: 'electron-html-fix',
+    transformIndexHtml(html) {
+      return html.replace(/\s+crossorigin(="[^"]*")?/g, '');
+    },
+  };
+}
 
 export default defineConfig({
   resolve: {
@@ -12,6 +22,7 @@ export default defineConfig({
   },
   plugins: [
     react(),
+    electronHtmlFix(),
     electron([
       {
         // Processus principal Electron
@@ -40,5 +51,6 @@ export default defineConfig({
   base: './',
   build: {
     outDir: 'dist',
+    modulePreload: false,
   },
 });
