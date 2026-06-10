@@ -1,0 +1,44 @@
+FCA Fiche Joueur — Installation sur Mac
+========================================
+
+Message affiché :
+"Apple n'a pas pu confirmer que l'application ne contenait pas de logiciel malveillant..."
+
+C'est NORMAL : l'app n'est pas signée avec un certificat Apple payant (99 €/an).
+L'application est sûre, mais macOS affiche cet avertissement par défaut.
+
+
+MÉTHODE 1 (la plus simple)
+--------------------------
+1. Téléchargez le fichier .zip Mac (x64 pour Mac Intel, arm64 pour Mac M1/M2/M3)
+2. Double-cliquez pour dézipper
+3. NE double-cliquez PAS sur l'app tout de suite
+4. Clic droit sur "FCA Fiche Joueur" → Ouvrir
+5. Cliquez sur "Ouvrir" dans la fenêtre qui apparaît
+
+Cette manipulation ne sera nécessaire qu'une seule fois.
+
+
+MÉTHODE 2 (si la méthode 1 ne marche pas)
+-----------------------------------------
+1. Ouvrez Réglages Système → Confidentialité et sécurité
+2. Descendez jusqu'à voir un message sur "FCA Fiche Joueur"
+3. Cliquez sur "Ouvrir quand même"
+
+
+MÉTHODE 3 (Terminal)
+--------------------
+Après avoir dézippé l'app, ouvrez Terminal et tapez :
+
+xattr -cr "/chemin/vers/FCA Fiche Joueur.app"
+
+Exemple si l'app est dans Téléchargements :
+xattr -cr ~/Downloads/"FCA Fiche Joueur.app"
+
+Puis ouvrez l'app normalement.
+
+
+Quel fichier Mac télécharger ?
+------------------------------
+- MacBook Pro 2019 (Intel) → fichier avec "x64" dans le nom
+- Mac M1 / M2 / M3 → fichier avec "arm64" dans le nom
