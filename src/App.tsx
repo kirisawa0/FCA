@@ -13,6 +13,7 @@ import { PlayersManagement } from '@/pages/PlayersManagement';
 import { PlayerProfile } from '@/pages/PlayerProfile';
 import { PlayerDashboard } from '@/pages/PlayerDashboard';
 import { CoachStatsTracking, PlayerStatsTracking } from '@/pages/StatsTracking';
+import { JoueurProfil } from '@/pages/JoueurProfil';
 import { Spinner } from '@/components/ui/Spinner';
 
 function RootRedirect() {
@@ -130,6 +131,16 @@ function AppRoutes() {
               <ProtectedRoute role="joueur">
                 <Layout>
                   <PlayerStatsTracking />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/joueur/profil"
+            element={
+              <ProtectedRoute role="joueur">
+                <Layout>
+                  <JoueurProfil />
                 </Layout>
               </ProtectedRoute>
             }

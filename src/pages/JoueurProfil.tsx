@@ -1,7 +1,8 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { updateProfile } from '@/services/profile';
-import type { CoachProfileInput } from '@/types';
+import { listMyPlayers } from '@/services/players';
+import type { CoachProfileInput, Team } from '@/types';
 import { computeAge, formatDate, fullName } from '@/lib/format';
 import { userFriendlyError } from '@/lib/dbErrors';
 import { Spinner } from '@/components/ui/Spinner';
@@ -16,9 +17,11 @@ function toForm(profile: ReturnType<typeof useAuth>['profile']): CoachProfileInp
   };
 }
 
-export function CoachProfile() {
+export function JoueurProfil() {
   const { profile, refreshProfile } = useAuth();
   const [form, setForm] = useState<CoachProfileInput>(toForm(profile));
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [loadingTeams, setLoadingTeams] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,6 +29,27 @@ export function CoachProfile() {
   useEffect(() => {
     setForm(toForm(profile));
   }, [profile]);
+
+  useEffect(() => {
+    if (!profile?.email) return;
+    setLoadingTeams(true);
+    listMyPlayers(profile.email)
+      .then((players) => {
+        const seen = new Set<string>();
+        const list: Team[] = [];
+        for (const p of players) {
+          for (const t of p.teams ?? []) {
+            if (!seen.has(t.id)) {
+              seen.add(t.id);
+              list.push(t);
+            }
+          }
+        }
+        setTeams(list);
+      })
+      .catch(console.error)
+      .finally(() => setLoadingTeams(false));
+  }, [profile?.email]);
 
   const age = computeAge(form.date_naissance);
   const isComplete = Boolean(form.nom.trim() && form.prenom.trim());
@@ -158,7 +182,7 @@ export function CoachProfile() {
             <label className="label">Présentation</label>
             <textarea
               className="input min-h-[100px] resize-y"
-              placeholder="Quelques mots sur votre parcours, votre rôle au club…"
+              placeholder="Quelques mots sur vous, votre poste, vos objectifs…"
               value={form.bio ?? ''}
               onChange={(e) => update('bio', e.target.value || null)}
               rows={4}
@@ -172,7 +196,31 @@ export function CoachProfile() {
           </div>
         </form>
       </div>
+
+      <section className="card card-top-accent p-6">
+        <h3 className="section-title">Mes équipes</h3>
+        {loadingTeams ? (
+          <div className="flex justify-center py-6">
+            <Spinner />
+          </div>
+        ) : teams.length === 0 ? (
+          <p className="mt-2 text-sm text-zinc-500">
+            Aucune équipe liée pour le moment. Rejoignez une équipe depuis la page Mes fiches.
+          </p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {teams.map((t) => (
+              <li
+                key={t.id}
+                className="flex items-center justify-between rounded-xl border border-fca-border bg-fca-gray/40 px-4 py-3"
+              >
+                <span className="font-medium text-white">{t.name}</span>
+                <span className="font-mono text-xs text-brand-400">{t.code}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }
-

@@ -75,8 +75,8 @@ export function Layout({ children }: { children: ReactNode }) {
     }`;
 
   return (
-    <div className="flex min-h-dvh">
-      <aside className="flex w-64 flex-col border-r border-fca-border bg-sidebar-gradient">
+    <div className="flex h-dvh overflow-hidden">
+      <aside className="flex h-dvh w-64 shrink-0 flex-col border-r border-fca-border bg-sidebar-gradient">
         <div className="relative flex flex-col items-center gap-2 px-4 py-7">
           <div className="pointer-events-none absolute inset-x-6 top-0 h-24 bg-[radial-gradient(ellipse_at_top,_rgba(250,204,21,0.18),_transparent_70%)]" />
           <Logo className="h-20 w-auto drop-shadow-[0_0_18px_rgba(250,204,21,0.25)]" />
@@ -87,7 +87,7 @@ export function Layout({ children }: { children: ReactNode }) {
 
         <div className="mx-4 h-px bg-gradient-to-r from-transparent via-fca-border to-transparent" />
 
-        <nav className="flex-1 space-y-1.5 px-3 py-5">
+        <nav className="flex-1 space-y-1.5 overflow-y-auto px-3 py-5">
           {isCoach &&
             coachNav.map((item) => (
               <NavLink key={item.to} to={item.to} end={item.to === '/coach'} className={navClass}>
@@ -111,13 +111,19 @@ export function Layout({ children }: { children: ReactNode }) {
                 </svg>
                 Statistiques
               </NavLink>
+              <NavLink to="/joueur/profil" className={navClass}>
+                <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Mon profil
+              </NavLink>
             </>
           )}
         </nav>
 
-        <div className="border-t border-fca-border p-3">
+        <div className="shrink-0 border-t border-fca-border p-3">
           <NavLink
-            to={isCoach ? '/coach/profil' : '/joueur'}
+            to={isCoach ? '/coach/profil' : '/joueur/profil'}
             className="flex items-center gap-3 rounded-xl bg-fca-gray/50 px-3 py-2.5 transition hover:bg-fca-gray"
           >
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gold-gradient text-sm font-bold text-black shadow-gold-sm">
@@ -140,7 +146,7 @@ export function Layout({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <main className="app-bg flex-1 overflow-y-auto">
+      <main className="app-bg min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto max-w-6xl px-8 py-8">{children}</div>
       </main>
     </div>
