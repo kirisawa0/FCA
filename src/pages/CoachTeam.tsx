@@ -17,8 +17,7 @@ import { useConfirm } from '@/contexts/ConfirmContext';
 import { userFriendlyError, logDbError } from '@/lib/dbErrors';
 
 
-const [teamName, setTeamName] = useState('');
-const [teamCategory, setTeamCategory] = useState<TeamCategory | ''>('');
+
 
 
 
@@ -31,10 +30,12 @@ export function CoachTeam() {
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [teamName, setTeamName] = useState('');
+  const [teamCategory, setTeamCategory] = useState<TeamCategory | ''>('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  
 
   async function load() {
     if (!profile) return;
