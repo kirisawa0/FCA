@@ -8,23 +8,19 @@ import {
   countTeamPlayers,
 } from '@/services/teams';
 import { listPlayers } from '@/services/players';
-import type { Player, Team } from '@/types';
+import type { Player, Team, TeamCategory } from '@/types';
+import { TEAM_CATEGORIES } from '@/types';
 import { fullName } from '@/lib/format';
 import { Spinner } from '@/components/ui/Spinner';
 import { Modal } from '@/components/ui/Modal';
 import { useConfirm } from '@/contexts/ConfirmContext';
 import { userFriendlyError, logDbError } from '@/lib/dbErrors';
 
-const TEAM_CATEGORIES = [
-  'U6',
-  'U8',
-  'U10',
-  'U12',
-  'U14',
-  'U16',
-  'U18/19',
-  'Senior',
-] as const;
+
+const [teamName, setTeamName] = useState('');
+const [teamCategory, setTeamCategory] = useState<TeamCategory | ''>('');
+
+
 
 export function CoachTeam() {
   const { profile } = useAuth();
@@ -78,12 +74,17 @@ export function CoachTeam() {
 
   async function handleCreate(e: FormEvent) {
     e.preventDefault();
-    if (!profile || !teamName.trim()) return;
+    if (!profile || !teamName.trim() || !teamCategory) return;
     setSaving(true);
     setError(null);
     try {
-      await createTeam(profile.id, { name: teamName.trim() });
+      await createTeam(profile.id, {
+        name: teamName.trim(),
+        category: teamCategory,
+      });
+
       setTeamName('');
+      setTeamCategory('');
       setModalOpen(false);
       await load();
     } catch (err) {
@@ -244,23 +245,33 @@ export function CoachTeam() {
               Nom de l’équipe
             </label>
 
-            <select
-              className="input mt-2"
-              value={teamName}
-              onChange={(e) => setTeamName(e.target.value)}
-              required
-              autoFocus
-            >
-              <option value="" disabled>
-                Sélectionner une catégorie
-              </option>
+            <div className="mt-2 grid grid-cols-1 gap-3 md:grid-cols-[1fr_160px]">
+              <input
+                className="input"
+                value={teamName}
+                onChange={(e) => setTeamName(e.target.value)}
+                placeholder="Ex : FCA Aix-les-Bains"
+                required
+                autoFocus
+              />
 
-              {TEAM_CATEGORIES.map((category) => (
-                <option key={category} value={category}>
-                  {category}
+              <select
+                className="input"
+                value={teamCategory}
+                onChange={(e) => setTeamCategory(e.target.value as TeamCategory)}
+                required
+              >
+                <option value="" disabled>
+                  Catégorie
                 </option>
-              ))}
-            </select>
+
+                {TEAM_CATEGORIES.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           <p className="text-xs text-zinc-500">
             Un code unique (ex : FCA-A3K9X2) sera généré automatiquement.

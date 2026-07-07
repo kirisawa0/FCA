@@ -23,11 +23,15 @@ export interface Team {
   id: string;
   coach_id: string;
   name: string;
+  category: TeamCategory | null;
   code: string;
   created_at: string;
 }
 
-export type TeamInput = Pick<Team, 'name'>;
+export interface TeamInput {
+  name: string;
+  category: TeamCategory;
+}
 
 export interface SignUpInput {
   email: string;
@@ -62,6 +66,19 @@ export interface PlayerNote {
   note: string;
   created_at: string;
 }
+
+export const TEAM_CATEGORIES = [
+  'U6',
+  'U8',
+  'U10',
+  'U12',
+  'U14',
+  'U16',
+  'U18/19',
+  'Senior',
+] as const;
+
+export type TeamCategory = typeof TEAM_CATEGORIES[number];
 
 export type {
   StatCategory,

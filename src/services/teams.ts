@@ -25,14 +25,24 @@ export async function getPrimaryTeam(coachId: string): Promise<Team | null> {
 }
 
 export async function createTeam(coachId: string, input: TeamInput): Promise<Team> {
-  const name = input.name.trim();
-  if (!name) throw new Error('Le nom de l’équipe est obligatoire.');
+  const baseName = input.name.trim();
+  const category = input.category.trim();
+
+  if (!baseName) throw new Error('Le nom de l’équipe est obligatoire.');
+  if (!category) throw new Error('La catégorie est obligatoire.');
+
+  const fullName = `${baseName} ${category}`;
 
   const { data, error } = await supabase
     .from('teams')
-    .insert({ coach_id: coachId, name })
+    .insert({
+      coach_id: coachId,
+      name: fullName,
+      category,
+    })
     .select('*')
     .single();
+
   if (error) throw error;
   return data as Team;
 }
