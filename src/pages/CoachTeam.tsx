@@ -15,6 +15,17 @@ import { Modal } from '@/components/ui/Modal';
 import { useConfirm } from '@/contexts/ConfirmContext';
 import { userFriendlyError, logDbError } from '@/lib/dbErrors';
 
+const TEAM_CATEGORIES = [
+  'U6',
+  'U8',
+  'U10',
+  'U12',
+  'U14',
+  'U16',
+  'U18/19',
+  'Senior',
+] as const;
+
 export function CoachTeam() {
   const { profile } = useAuth();
   const confirm = useConfirm();
@@ -229,15 +240,27 @@ export function CoachTeam() {
             </div>
           )}
           <div>
-            <label className="label">Nom de l’équipe</label>
-            <input
-              className="input"
-              placeholder="Ex : U17 FCA"
+            <label className="text-sm font-medium text-zinc-200">
+              Nom de l’équipe
+            </label>
+
+            <select
+              className="input mt-2"
               value={teamName}
               onChange={(e) => setTeamName(e.target.value)}
               required
               autoFocus
-            />
+            >
+              <option value="" disabled>
+                Sélectionner une catégorie
+              </option>
+
+              {TEAM_CATEGORIES.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
           </div>
           <p className="text-xs text-zinc-500">
             Un code unique (ex : FCA-A3K9X2) sera généré automatiquement.
