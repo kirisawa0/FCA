@@ -12,6 +12,7 @@ export const GLOBAL_NOTE_BONUS_MAX = 1;
 export interface StatCategory {
   id: string;
   player_id: string;
+  team_id: string | null;
   label: string;
   sort_order: number;
   created_at: string;

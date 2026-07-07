@@ -4,7 +4,7 @@ import {
   listCategories,
   addCategory,
   deleteCategory,
-  seedDefaultCategories,
+  seedPlayerCategoriesFromTeam,
 } from '@/services/statCategories';
 import {
   listEvaluations,
@@ -51,9 +51,17 @@ export function PlayerStatsPanel({ playerId, teamId, canEdit }: Props) {
     setLoading(true);
     setLoadError(null);
     try {
-      await seedDefaultCategories(playerId);
+      if (!teamId) {
+        setCategories([]);
+        setEvaluations([]);
+        setLoadError('Sélectionne une équipe pour afficher les statistiques.');
+        return;
+      }
+
+      await seedPlayerCategoriesFromTeam(playerId, teamId);
+
       const [cats, evals] = await Promise.all([
-        listCategories(playerId),
+        listCategories(playerId, teamId),
         listEvaluations(playerId, teamId),
       ]);
       setCategories(cats);
@@ -137,7 +145,12 @@ export function PlayerStatsPanel({ playerId, teamId, canEdit }: Props) {
     if (!newCatLabel.trim()) return;
     setSaving(true);
     try {
-      const created = await addCategory(playerId, newCatLabel);
+      if (!teamId) {
+        alert('Sélectionne une équipe avant d’ajouter une statistique.');
+        return;
+      }
+
+      const created = await addCategory(playerId, teamId, newCatLabel);
       setCategories((prev) => [...prev, created]);
       setNewCatLabel('');
     } catch (err: any) {

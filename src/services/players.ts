@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import type { Player, PlayerInput, Team } from '@/types';
-import { seedDefaultCategories } from '@/services/statCategories';
 import { isMissingTableError } from '@/lib/dbErrors';
+import { seedPlayerCategoriesFromTeam } from '@/services/statCategories';
 
 const playerSelect = '*, player_teams(team:teams(id, name, code))';
 
@@ -232,10 +232,8 @@ export async function createPlayer(
   const playerId = (data as { id: string }).id;
   await setPlayerTeams(playerId, team_ids);
 
-  try {
-    await seedDefaultCategories(playerId);
-  } catch (err) {
-    console.warn('Stats non initialisées — exécutez supabase/migration_stats_v2.sql', err);
+  for (const teamId of team_ids) {
+    await seedPlayerCategoriesFromTeam(playerId, teamId);
   }
 
   return getPlayer(playerId);

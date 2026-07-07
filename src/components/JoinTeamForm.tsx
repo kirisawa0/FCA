@@ -1,6 +1,5 @@
 import { useState, type FormEvent } from 'react';
 import { joinTeamByCode } from '@/services/teams';
-import { seedDefaultCategories } from '@/services/statCategories';
 import { userFriendlyError, dbErrorMessage } from '@/lib/dbErrors';
 
 interface Props {
@@ -36,18 +35,11 @@ export function JoinTeamForm({
     setError(null);
     setSuccess(null);
     try {
-      const playerId = await joinTeamByCode(
+      await joinTeamByCode(
         code,
         existingPlayer ? undefined : nom,
         existingPlayer ? undefined : prenom
       );
-      if (!existingPlayer) {
-        try {
-          await seedDefaultCategories(playerId);
-        } catch (err) {
-          console.warn('Stats non initialisées', err);
-        }
-      }
       if (existingPlayer) {
         setSuccess('Équipe ajoutée à votre fiche.');
         setCode('');

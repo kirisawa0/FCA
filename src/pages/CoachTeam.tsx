@@ -15,6 +15,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { Modal } from '@/components/ui/Modal';
 import { useConfirm } from '@/contexts/ConfirmContext';
 import { userFriendlyError, logDbError } from '@/lib/dbErrors';
+import { replaceTeamStatCategories } from '@/services/teamStatCategories';
 
 
 
@@ -35,6 +36,9 @@ export function CoachTeam() {
   const [error, setError] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [teamStatsText, setTeamStatsText] = useState(
+  'Technique\nPhysique\nAffectif\nMentales\nPerceptif Décisionnel'
+  );
   
 
   async function load() {
@@ -79,13 +83,29 @@ export function CoachTeam() {
     setSaving(true);
     setError(null);
     try {
-      await createTeam(profile.id, {
+      const statsLabels = teamStatsText
+        .split('\n')
+        .map((stat) => stat.trim())
+        .filter(Boolean);
+
+      if (statsLabels.length === 0) {
+        setError('Ajoute au moins une statistique par défaut.');
+        return;
+      }
+
+      const createdTeam = await createTeam(profile.id, {
         name: teamName.trim(),
         category: teamCategory,
       });
 
+      await replaceTeamStatCategories(createdTeam.id, statsLabels);
+
       setTeamName('');
       setTeamCategory('');
+      setTeamStatsText(
+        'Technique\nPhysique\nAffectif\nMentales\nPerceptif Décisionnel'
+      );
+
       setModalOpen(false);
       await load();
     } catch (err) {
@@ -272,6 +292,21 @@ export function CoachTeam() {
                   </option>
                 ))}
               </select>
+              <label className="mt-4 block text-sm font-medium text-zinc-200">
+                Stats par défaut de cette catégorie
+              </label>
+
+              <textarea
+                className="input mt-2 min-h-32"
+                value={teamStatsText}
+                onChange={(e) => setTeamStatsText(e.target.value)}
+                placeholder={'Ex :\nVitesse\nEndurance\nPlaquage\nPasse'}
+                required
+              />
+
+              <p className="mt-2 text-xs text-zinc-500">
+                Écris une statistique par ligne. Ces stats seront utilisées pour les joueurs de cette équipe.
+              </p>
             </div>
           </div>
           <p className="text-xs text-zinc-500">

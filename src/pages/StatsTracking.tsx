@@ -3,7 +3,11 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useConfirm } from '@/contexts/ConfirmContext';
 import { listPlayers, type PlayerFicheView, buildPlayerFicheViews, listMyPlayers } from '@/services/players';
 import { listMyTeams } from '@/services/teams';
-import { listCategories, seedDefaultCategories } from '@/services/statCategories';
+import {
+  listCategories,
+  seedPlayerCategoriesFromTeam,
+} from '@/services/statCategories';
+
 import { listEvaluations, getFinalNote, computeAverage } from '@/services/stats';
 import {
   listMatchStats,
@@ -180,20 +184,31 @@ function PlayerStatsView({ player, teamId, canEdit, teamLabel }: PlayerStatsView
   const [activeTab, setActiveTab] = useState<'evaluations' | 'matchs'>('evaluations');
 
   useEffect(() => {
-    setLoading(true);
-    Promise.all([
-      seedDefaultCategories(player.id).then(() => listCategories(player.id)),
-      listEvaluations(player.id, teamId),
-      listMatchStats(player.id, teamId),
-    ])
-      .then(([cats, evals, ms]) => {
-        setCategories(cats);
-        setEvaluations(evals);
-        setMatchStats(ms);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [player.id, teamId]);
+  if (!teamId) {
+    setCategories([]);
+    setEvaluations([]);
+    setMatchStats([]);
+    setLoading(false);
+    return;
+  }
+
+  setLoading(true);
+
+  Promise.all([
+    seedPlayerCategoriesFromTeam(player.id, teamId).then(() =>
+      listCategories(player.id, teamId)
+    ),
+    listEvaluations(player.id, teamId),
+    listMatchStats(player.id, teamId),
+  ])
+    .then(([cats, evals, ms]) => {
+      setCategories(cats);
+      setEvaluations(evals);
+      setMatchStats(ms);
+    })
+    .catch(console.error)
+    .finally(() => setLoading(false));
+}, [player.id, teamId]);
 
   /* ── computed ── */
   const sortedEvals = useMemo(
@@ -800,7 +815,7 @@ export function CoachStatsTracking() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
-  const [teamFilter, setTeamFilter] = useState<string>('all');
+  const [teamFilter, setTeamFilter] = useState<string>('');
 
   useEffect(() => {
     if (!profile) return;
@@ -808,7 +823,13 @@ export function CoachStatsTracking() {
       .then(([p, t]) => {
         setPlayers(p);
         setTeams(t);
-        if (p.length > 0) setSelectedPlayerId(p[0].id);
+        if (t.length > 0) {
+          setTeamFilter(t[0].id);
+        }
+
+        if (p.length > 0) {
+          setSelectedPlayerId(p[0].id);
+        }
       })
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -816,9 +837,9 @@ export function CoachStatsTracking() {
 
   const filteredPlayers = useMemo(
     () =>
-      teamFilter === 'all'
-        ? players
-        : players.filter((p) => p.teams?.some((t) => t.id === teamFilter)),
+      teamFilter
+        ? players.filter((p) => p.teams?.some((t) => t.id === teamFilter))
+        : [],
     [players, teamFilter]
   );
 
@@ -867,7 +888,7 @@ export function CoachStatsTracking() {
                   setSelectedPlayerId(null);
                 }}
               >
-                <option value="all">Toutes les équipes</option>
+                <option value="" disabled>Choisir une équipe</option>
                 {teams.map((t) => (
                   <option key={t.id} value={t.id}>
                     {t.name}

@@ -1,7 +1,7 @@
 import { supabase } from '@/lib/supabase';
 import type { Team, TeamInput } from '@/types';
 import { listMyPlayers } from '@/services/players';
-import { seedDefaultCategories } from '@/services/statCategories';
+
 
 export interface PlayerJoinMetadata {
   team_code?: string | null;
