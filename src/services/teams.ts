@@ -93,11 +93,7 @@ export async function ensurePlayerJoined(
   const prenom = metadata?.prenom ?? fallback?.prenom ?? undefined;
 
   const playerId = await joinTeamByCode(teamCode, nom, prenom);
-  try {
-    await seedDefaultCategories(playerId);
-  } catch (err) {
-    console.warn('Stats non initialisées', err);
-  }
+
   return playerId;
 }
 
