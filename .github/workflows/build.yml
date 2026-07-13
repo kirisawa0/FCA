@@ -114,7 +114,7 @@ jobs:
       - name: Download Mac artifact
         uses: actions/download-artifact@v4
         with:
-          name: FCA-Fiche-Joueur-Mac-1.0.1
+          name: FCA-Fiche-Joueur-Mac-1.0.2
           path: ./release-mac
 
       - name: Create GitHub Release
@@ -122,5 +122,6 @@ jobs:
         with:
           files: |
             release-win/*.exe
+            release-mac/*.dmg
             release-mac/*.zip
           generate_release_notes: true
