@@ -81,7 +81,7 @@ jobs:
           fi
           echo "Secrets Supabase OK."
 
-      - name: Build Mac (zip x64 + arm64)
+      - name: Build Mac (DMG + ZIP, Intel + Apple Silicon)
         run: npm run dist:mac
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -91,8 +91,10 @@ jobs:
       - name: Upload Mac artifact
         uses: actions/upload-artifact@v4
         with:
-          name: FCA-Fiche-Joueur-Mac-1.0.1
-          path: release/*.zip
+          name: FCA-Fiche-Joueur-Mac-1.0.2
+          path: 
+            release/*.dmg
+            release/*.zip
           retention-days: 90
           if-no-files-found: error
 
