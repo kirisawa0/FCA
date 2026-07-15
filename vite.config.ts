@@ -114,6 +114,8 @@ export default defineConfig(({ mode }) => {
 
           VitePWA({
 
+            strategies: 'generateSW',
+            
             /*
             Met automatiquement à jour
             l'application lorsque tu publies
@@ -121,7 +123,7 @@ export default defineConfig(({ mode }) => {
             */
             registerType: 'autoUpdate',
 
-
+            injectRegister: 'auto',
             /*
             Images copiées dans le cache local.
             */
