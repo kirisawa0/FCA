@@ -1,0 +1,122 @@
+name: Deploy PWA
+
+
+on:
+
+  push:
+
+    branches:
+
+      - main
+
+
+  workflow_dispatch:
+
+
+permissions:
+
+  contents: read
+
+  pages: write
+
+  id-token: write
+
+
+concurrency:
+
+  group: pages
+
+  cancel-in-progress: false
+
+
+jobs:
+
+
+  build:
+
+    runs-on: ubuntu-latest
+
+
+    steps:
+
+
+      - name: Télécharger le projet
+
+        uses: actions/checkout@v4
+
+
+      - name: Installer Node.js
+
+        uses: actions/setup-node@v4
+
+        with:
+
+          node-version: '22'
+
+          cache: npm
+
+
+      - name: Installer les dépendances
+
+        run: npm ci
+
+
+      - name: Construire la PWA
+
+        run: npm run build:pwa
+
+        env:
+
+          VITE_SUPABASE_URL:
+            ${{ secrets.VITE_SUPABASE_URL }}
+
+          VITE_SUPABASE_ANON_KEY:
+            ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+
+      - name: Configurer GitHub Pages
+
+        uses: actions/configure-pages@v5
+
+
+      - name: Envoyer les fichiers PWA
+
+        uses: actions/upload-pages-artifact@v3
+
+        with:
+
+          path: ./dist
+
+
+
+  deploy:
+
+    needs: build
+
+
+    permissions:
+
+      pages: write
+
+      id-token: write
+
+
+    environment:
+
+      name: github-pages
+
+      url:
+        ${{ steps.deployment.outputs.page_url }}
+
+
+    runs-on: ubuntu-latest
+
+
+    steps:
+
+
+      - name: Publier la PWA
+
+        id: deployment
+
+        uses: actions/deploy-pages@v5
