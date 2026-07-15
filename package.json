@@ -8,12 +8,19 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:pwa": "vite --mode pwa --host 0.0.0.0",
+
     "build": "tsc --noEmit && vite build",
+    "build:pwa": "tsc --noEmit && vite build --mode pwa",
+
     "preview": "vite preview",
+    "preview:pwa": "vite preview --host 0.0.0.0",
+
     "lint": "eslint . --ext .ts,.tsx",
+
     "dist": "npm run build && electron-builder",
     "dist:win": "npm run build && electron-builder --win --publish never",
-    "dist:mac": "npm run build && electron-builder --mac dmg zip --x64 --arm64 --publish never"
+    "dist:mac": "npm run build && electron-builder --mac --publish never"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.4",
@@ -38,7 +45,8 @@
     "typescript": "^5.5.4",
     "vite": "^5.4.3",
     "vite-plugin-electron": "^0.28.8",
-    "vite-plugin-electron-renderer": "^0.14.6"
+    "vite-plugin-electron-renderer": "^0.14.6",
+    "vite-plugin-pwa": "^1.3.0"
   },
   "build": {
     "appId": "com.fca.fichejoueur",
