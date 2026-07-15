@@ -9,15 +9,11 @@
   "scripts": {
     "dev": "vite",
     "dev:pwa": "vite --mode pwa --host 0.0.0.0",
-
     "build": "tsc --noEmit && vite build",
     "build:pwa": "tsc --noEmit && vite build --mode pwa",
-
     "preview": "vite preview",
     "preview:pwa": "vite preview --host 0.0.0.0",
-
     "lint": "eslint . --ext .ts,.tsx",
-
     "dist": "npm run build && electron-builder",
     "dist:win": "npm run build && electron-builder --win --publish never",
     "dist:mac": "npm run build && electron-builder --mac --publish never"
@@ -104,5 +100,9 @@
     "dmg": {
       "title": "FCA-Fiche-Joueur-${version}"
     }
+  },
+  "allowScripts": {
+    "electron@31.7.7": true,
+    "esbuild@0.21.5": true
   }
 }
